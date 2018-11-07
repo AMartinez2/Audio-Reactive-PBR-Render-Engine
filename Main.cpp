@@ -10,9 +10,19 @@
 #include <BASS/bass.h>
 
 
+// settings
+const unsigned int SCR_WIDTH = 1920;
+const unsigned int SCR_HEIGHT = 1080;
+
+
+// Prototypes
 HSTREAM bassInit(const char* audioFile);
+void framebuffer_size_callback(GLFWwindow* window, int width, int height);
+void mouse_callback(GLFWwindow* window, double xpos, double ypos);
+void processInput(GLFWwindow *window);
 
 
+// Program entry point
 int main() {
 	HSTREAM stream = bassInit("air.mp3");
 	if (!stream) {
@@ -33,11 +43,8 @@ int main() {
 		return -1;
 	}
 	glfwMakeContextCurrent(window);
-	// TODO::Window functionality 
-	//glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-	//glfwSetCursorPosCallback(window, mouse_callback);
-	//glfwSetCursorPosCallback(window, mouse_callback);
-	//glfwSetScrollCallback(window, scroll_callback);
+	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+	glfwSetCursorPosCallback(window, mouse_callback);
 
 	// tell GLFW to capture mouse
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
@@ -51,7 +58,7 @@ int main() {
 	// configure global opengl State
 	glEnable(GL_DEPTH_TEST);
 
-
+	// Initialize our sound stream buffer
 	BASS_Start();
 	BASS_ChannelPlay(stream, false);
 	const int NUM_BINS = 512;
@@ -89,6 +96,10 @@ int main() {
 			bins[i] = (bins[i] + prevbins[i]) * 0.5f;
 			blue += bins[i];
 		}
+
+		// User input
+		processInput(window);
+
 		// render
 		std::cout << blue/50000 << std::endl;
 		glClearColor(0.05f, 0.05f, blue / 50000, 1.0f);
@@ -115,4 +126,24 @@ HSTREAM bassInit(const char* audioFile) {
 		return -1;
 	}
 	return stream;
+}
+
+
+// glfw: This callback function is called whenever the window changes size
+void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
+	// Height will be significantly larger than specified on retina displays
+	glViewport(0, 0, width, height);
+}
+
+// glfw: This callback function is called whenever the mouse moves
+void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
+	// TODO: implement when we have a working camera
+	return;
+}
+
+void processInput(GLFWwindow *window) {
+	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
+		glfwSetWindowShouldClose(window, true);
+	}
+	// TODO: implement more key functionality when we get a working camera
 }

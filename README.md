@@ -8,4 +8,4 @@
 * [stb_image](https://github.com/nothings/stb/blob/master/stb_image.h)
 * [GLM](https://glm.g-truc.net/0.9.9/index.html)
 * [Assimp](http://www.assimp.org/)
-* [FFTW](http://www.fftw.org/)
+* [BASS](https://www.un4seen.com/)
