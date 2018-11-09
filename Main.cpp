@@ -145,6 +145,11 @@ int main() {
 	float FFT_SAMPLE_RANGEf = 1024.0f / (float)NUM_BINS;
 	// render loop
 	while (!glfwWindowShouldClose(window)) {
+		// per-frame time logic
+		float currentFrame = glfwGetTime();
+		deltaTime = currentFrame - lastFrame;
+		lastFrame = currentFrame;
+
 		float fft[1024];
 		BASS_ChannelGetData(stream, fft, BASS_DATA_FFT2048);
 		//TODO NORMALISE AFTER SQRT
