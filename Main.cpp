@@ -4,6 +4,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <glm/gtx/string_cast.hpp>
 
 #include <iostream>
 
@@ -25,7 +26,7 @@ void processInput(GLFWwindow *window);
 
 
 // camera
-Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
+Camera camera(glm::vec3(2.0f, 0.0f, 16.0f));
 float lastX = SCR_WIDTH / 2.0f;
 float lastY = SCR_HEIGHT / 2.0f;
 bool firstMouse = true;
@@ -36,6 +37,7 @@ float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
 
+// Use primative vertex object just while we resolve frequency interpretation
 float vertices[] = {
 	// positions          
 	-0.5f, -0.5f, -0.5f,  
@@ -79,6 +81,18 @@ float vertices[] = {
 	 0.5f,  0.5f,  0.5f,
 	-0.5f,  0.5f,  0.5f,
 	-0.5f,  0.5f, -0.5f,
+};
+
+
+glm::vec3 positions[] = {
+	glm::vec3(-7.0f, 0.0f, 0.0f),
+	glm::vec3(-5.0f, 0.0f, 0.0f),
+	glm::vec3(-3.0f, 0.0f, 0.0f),
+	glm::vec3(-1.0f, 0.0f, 0.0f),
+	glm::vec3(1.0f, 0.0f, 0.0f),
+	glm::vec3(3.0f, 0.0f, 0.0f),
+	glm::vec3(5.0f, 0.0f, 0.0f),
+	glm::vec3(7.0f, 0.0f, 0.0f),
 };
 
 
@@ -128,8 +142,11 @@ int main() {
 	glEnable(GL_DEPTH_TEST);
 
 	// Initialize our sound stream buffer
-	SoundControl soundControl("air.mp3");
+	//SoundControl soundControl("air.mp3");
+	SoundControl soundControl("jasei.mp3");
+	// Play the audio	
 	soundControl.playAudio();
+
 	// render loop
 	while (!glfwWindowShouldClose(window)) {
 		// per-frame time logic
@@ -139,16 +156,25 @@ int main() {
 
 		// User input
 		processInput(window);
-
 		
+		// Extract lower granularity frequency bins
 		float* bins = soundControl.processBins();
-		float blue = 0;
-		for (int i = 0; i < 10; i++) {
-			blue += bins[i];
+		float cols[8];
+		int count = 0;
+		int index = 0;
+		float temp = 0;
+		// We need 10 freq data samples. So every 15 bins, we stash our current accumulation and start a new one.
+		for (int i = 0; i < soundControl.getNumBins(); i++) {
+			temp += bins[i];
+			if (count == 64) {
+				cols[index] = temp;
+				index += 1;
+				count = 0;
+				temp = 0;
+			}
+			count += 1;
 		}
 		// render
-		//std::cout << blue/50000 << std::endl;
-		//glClearColor(0.05f, 0.05f, blue / 50000, 1.0f);
 		glClearColor(0.05f, 0.05f, 0.05f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -159,15 +185,20 @@ int main() {
 		shader.setMat4("projection", projection);
 		shader.setMat4("view", view);
 
-		// world transformation
-		glm::mat4 model;
-		//model = glm::translate(model, glm::vec3(-2.0f, 0.0f, 0.0f));
-		glm::vec3 color (0.05, blue / 10000, 0.05f);
-		//glm::vec3 color(0.05, 0.05f, 0.05f);
-		shader.setVec3("color", color);
-		shader.setMat4("model", model);
+		std::cout << cols[0] << std::endl;
 		glBindVertexArray(cubeVAO);
-		glDrawArrays(GL_TRIANGLES, 0, 36);
+		for (int i = 0; i < 8; i++) {
+			// World transformation
+			glm::mat4 model;
+			model = glm::translate(model, positions[i]);
+			// Set the cube color
+			glm::vec3 color(0.05, cols[i], 0.05f);
+			// Assign the values to our shader
+			shader.setVec3("color", color);
+			shader.setMat4("model", model);
+			// Draw
+			glDrawArrays(GL_TRIANGLES, 0, 36);
+		}
 
 		// swap buffers and poll IO events
 		glfwSwapBuffers(window);
@@ -197,8 +228,7 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 
 // glfw: This callback function is called whenever the mouse moves
 void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
-	if (firstMouse)
-	{
+	if (firstMouse) {
 		lastX = xpos;
 		lastY = ypos;
 		firstMouse = false;

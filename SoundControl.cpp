@@ -44,11 +44,9 @@ void SoundControl::playAudio() {
 
 float* SoundControl::processBins() {
 	BASS_ChannelGetData(_audioStream, _fft, BASS_DATA_FFT2048);
-	//TODO NORMALISE AFTER SQRT
-	// Scale FFT values
-	for (int i = 0; i < _fftSampleRange; i++)
-		_fft[i] = sqrt(_fft[i]) * (5.0f * 800.0f);
 
+	//freqPreprocess();
+	
 	// Update the old bins
 	std::copy(_bins, _bins + _numBins, _prevBins);
 
@@ -69,4 +67,18 @@ float* SoundControl::processBins() {
 		_bins[i] = (_bins[i] + _prevBins[i]) * 0.5f;
 	}
 	return _bins;
+}
+
+
+void SoundControl::freqPreprocess() {
+	//TODO NORMALISE AFTER SQRT
+	// Scale FFT values
+	for (int i = 0; i < _fftSampleRange; i++)
+		_fft[i] = sqrt(_fft[i]) * (5.0f * 800.0f);
+}
+
+
+// Getters and setters 
+int SoundControl::getNumBins() {
+	return _numBins;
 }
