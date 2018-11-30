@@ -17,12 +17,12 @@ public:
 	~SoundControl();
 	// Play the audio stream
 	void playAudio();
+	// Stop the audio stream
+	void stopAudio();
 	// Return all audio frequency bins
 	float* processBins();
-
 	// Getters and setters
-	int getNumBins();
-	//void setNumBins(int num); // If implemented, will need functionality to update all associated variables
+	int getFFTRange();
 
 private:
 	// Number of bins, basically the resolution/granularity of the frequency reference
@@ -37,9 +37,6 @@ private:
 	float* _bins;
 	float* _prevBins;
 	float* _fft;
-
-	// Function to encapsulate all the necessary math applied to stream data prior the FFT
-	void freqPreprocess();
 };
 
 #endif

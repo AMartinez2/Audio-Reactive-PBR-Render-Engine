@@ -20,9 +20,6 @@ SoundControl::SoundControl(const char* soundFile) : _numBins(512), _fftRange(102
 	_audioStream = stream;
 
 	// Initialize the rest of the private member variables
-	//--- TODO: these sizes may need to be adaptive to the parameters of the given audio file
-	_fftSampleRange = _fftRange / (float)_numBins;
-	_bins = new float[_numBins];
 	_prevBins = new float[_numBins];
 	_fft = new float[_fftRange];
 	return;
@@ -42,43 +39,22 @@ void SoundControl::playAudio() {
 }
 
 
-float* SoundControl::processBins() {
-	BASS_ChannelGetData(_audioStream, _fft, BASS_DATA_FFT2048);
-
-	//freqPreprocess();
-	
-	// Update the old bins
-	std::copy(_bins, _bins + _numBins, _prevBins);
-
-	// Update the new bins
-	for (int i = 0; i < _numBins; i++) {
-		_bins[i] = 0.0f;
-
-		// Get upper and lower values for FFT sampling
-		int lower = roundf(_fftSampleRange * (float)(i));
-		int upper = roundf(_fftSampleRange * (float)(i + 1));
-
-		// Average of FFT values 
-		for (int j = lower; j < upper; j++)
-			_bins[i] += _fft[j];
-		_bins[i] /= _fftSampleRange;
-
-		// Smooth by averaging old and new bins
-		_bins[i] = (_bins[i] + _prevBins[i]) * 0.5f;
-	}
-	return _bins;
+void SoundControl::stopAudio() {
+	BASS_ChannelStop(_audioStream);
 }
 
 
-void SoundControl::freqPreprocess() {
-	//TODO NORMALISE AFTER SQRT
+float* SoundControl::processBins() {
+	BASS_ChannelGetData(_audioStream, _fft, BASS_DATA_FFT2048);
 	// Scale FFT values
-	for (int i = 0; i < _fftSampleRange; i++)
-		_fft[i] = sqrt(_fft[i]) * (5.0f * 800.0f);
+	for (int i = 0; i < _fftRange; i++) {
+		_fft[i] = sqrt(_fft[i]) * (5.0f);
+	}
+	return _fft;
 }
 
 
 // Getters and setters 
-int SoundControl::getNumBins() {
-	return _numBins;
+int SoundControl::getFFTRange() {
+	return _fftRange;
 }

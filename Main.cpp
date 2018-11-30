@@ -93,6 +93,9 @@ glm::vec3 positions[] = {
 	glm::vec3(3.0f, 0.0f, 0.0f),
 	glm::vec3(5.0f, 0.0f, 0.0f),
 	glm::vec3(7.0f, 0.0f, 0.0f),
+	glm::vec3(9.0f, 0.0f, 0.0f),
+	glm::vec3(11.0f, 0.0f, 0.0f),
+	glm::vec3(13.0f, 0.0f, 0.0f),
 };
 
 
@@ -112,6 +115,7 @@ int main() {
 		return -1;
 	}
 	glfwMakeContextCurrent(window);
+
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 	glfwSetCursorPosCallback(window, mouse_callback);
 	glfwSetScrollCallback(window, scroll_callback);
@@ -142,8 +146,9 @@ int main() {
 	glEnable(GL_DEPTH_TEST);
 
 	// Initialize our sound stream buffer
-	//SoundControl soundControl("air.mp3");
-	SoundControl soundControl("jasei.mp3");
+	SoundControl soundControl("air.mp3");
+	//SoundControl soundControl("jasei.mp3");
+
 	// Play the audio	
 	soundControl.playAudio();
 
@@ -159,15 +164,15 @@ int main() {
 		
 		// Extract lower granularity frequency bins
 		float* bins = soundControl.processBins();
-		float cols[8];
+		float cols[10];
 		int count = 0;
 		int index = 0;
 		float temp = 0;
 		// We need 10 freq data samples. So every 15 bins, we stash our current accumulation and start a new one.
-		for (int i = 0; i < soundControl.getNumBins(); i++) {
+		for (int i = 24; i < soundControl.getFFTRange(); i++) {
 			temp += bins[i];
-			if (count == 64) {
-				cols[index] = temp;
+			if (count == 100) {
+				cols[index] = temp/100;
 				index += 1;
 				count = 0;
 				temp = 0;
@@ -175,7 +180,7 @@ int main() {
 			count += 1;
 		}
 		// render
-		glClearColor(0.05f, 0.05f, 0.05f, 1.0f);
+		glClearColor(0.05f, 0.05f, 0.1f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		shader.use();
@@ -185,14 +190,14 @@ int main() {
 		shader.setMat4("projection", projection);
 		shader.setMat4("view", view);
 
-		std::cout << cols[0] << std::endl;
+		//std::cout << cols[3] << std::endl;
 		glBindVertexArray(cubeVAO);
-		for (int i = 0; i < 8; i++) {
+		for (int i = 0; i < 10; i++) {
 			// World transformation
 			glm::mat4 model;
 			model = glm::translate(model, positions[i]);
 			// Set the cube color
-			glm::vec3 color(0.05, cols[i], 0.05f);
+			glm::vec3 color(0.05, bins[i], 0.05f);
 			// Assign the values to our shader
 			shader.setVec3("color", color);
 			shader.setMat4("model", model);
@@ -204,10 +209,12 @@ int main() {
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
+	
 	glDeleteVertexArrays(1, &cubeVAO);
 	glDeleteBuffers(1, &VBO);
 
 	glfwTerminate();
+	//soundControl.~SoundControl();
 	return 0;
 }
 
@@ -243,6 +250,8 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
 	camera.ProcessMouseMovement(xoffset, yoffset);
 }
 
+
+// Process Keyboard inputs
 void processInput(GLFWwindow *window) {
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
 		glfwSetWindowShouldClose(window, true);
