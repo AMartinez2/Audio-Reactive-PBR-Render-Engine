@@ -47,9 +47,22 @@ void SoundControl::stopAudio() {
 float* SoundControl::processBins() {
 	BASS_ChannelGetData(_audioStream, _fft, BASS_DATA_FFT2048);
 	// Scale FFT values
+	float min = 999;
+	float max = -999;
 	for (int i = 0; i < _fftRange; i++) {
 		_fft[i] = sqrt(_fft[i]) * (5.0f);
+		if (_fft[i] < min) {
+			min = _fft[i];
+		}
+		if (_fft[i] > max) {
+			max = _fft[i];
+		}
 	}
+	// Normalize: normalized = (x-min(x))/(max(x)-min(x))
+	for (int i = 0; i < _fftRange; i++) {
+		_fft[i] = (_fft[i] - min) / (max - min);
+	}
+
 	return _fft;
 }
 
