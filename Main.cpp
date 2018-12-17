@@ -26,7 +26,7 @@ void processInput(GLFWwindow *window);
 
 
 // camera
-Camera camera(glm::vec3(2.0f, 0.0f, 16.0f));
+Camera camera(glm::vec3(0.0f, 3.0f, 20.0f));
 float lastX = SCR_WIDTH / 2.0f;
 float lastY = SCR_HEIGHT / 2.0f;
 bool firstMouse = true;
@@ -85,16 +85,16 @@ float vertices[] = {
 
 
 glm::vec3 positions[] = {
-	glm::vec3(-7.0f, 0.0f, 0.0f),
-	glm::vec3(-5.0f, 0.0f, 0.0f),
-	glm::vec3(-3.0f, 0.0f, 0.0f),
 	glm::vec3(-1.0f, 0.0f, 0.0f),
 	glm::vec3(1.0f, 0.0f, 0.0f),
+	glm::vec3(-3.0f, 0.0f, 0.0f),
 	glm::vec3(3.0f, 0.0f, 0.0f),
+	glm::vec3(-5.0f, 0.0f, 0.0f),
 	glm::vec3(5.0f, 0.0f, 0.0f),
+	glm::vec3(-7.0f, 0.0f, 0.0f),
 	glm::vec3(7.0f, 0.0f, 0.0f),
+	glm::vec3(-9.0f, 0.0f, 0.0f),
 	glm::vec3(9.0f, 0.0f, 0.0f),
-	glm::vec3(11.0f, 0.0f, 0.0f),
 	glm::vec3(13.0f, 0.0f, 0.0f),
 };
 
@@ -146,11 +146,17 @@ int main() {
 	glEnable(GL_DEPTH_TEST);
 
 	// Initialize our sound stream buffer
-	SoundControl soundControl("air.mp3");
+	SoundControl soundControl("HOT DRUM.mp3");
 	//SoundControl soundControl("jasei.mp3");
 
 	// Play the audio	
 	soundControl.playAudio();
+
+	// Change direction camera faces
+	camera.Front = camera.Front - glm::vec3(0.0f, 0.15f, 0.0f);
+
+	// Rotation angle
+	float angle = 0;
 
 	// render loop
 	while (!glfwWindowShouldClose(window)) {
@@ -195,6 +201,7 @@ int main() {
 		for (int i = 0; i < 10; i++) {
 			// World transformation
 			glm::mat4 model;
+			model = glm::rotate(model, glm::radians(angle), glm::vec3(0.0f, 1.0f, 0.0f));
 			model = glm::translate(model, positions[i]);
 			// Set the cube color
 			glm::vec3 color(0.05, bins[i], 0.05f);
@@ -203,6 +210,12 @@ int main() {
 			shader.setMat4("model", model);
 			// Draw
 			glDrawArrays(GL_TRIANGLES, 0, 36);
+		}
+		if (angle >= 360.0f) {
+			angle = 0;
+		}
+		else {
+			angle += 0.5f;
 		}
 
 		// swap buffers and poll IO events
