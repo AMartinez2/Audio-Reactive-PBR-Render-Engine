@@ -11,6 +11,7 @@
 #include "Shader.h"
 #include "Camera.h"
 #include "SoundControl.h"
+#include "Model.h"
 
 
 // settings
@@ -23,6 +24,7 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void processInput(GLFWwindow *window);
+void renderCubes(Shader shader, glm::mat4 projection, glm::mat4 view, unsigned int cubeVAO, float angle, float* bins);
 
 
 // camera
@@ -140,10 +142,12 @@ int main() {
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
 
+	Shader modelShader("./shaders/model_shader.vert", "./shaders/model_shader.frag");
 	Shader shader("./shaders/vShader.vert", "./shaders/fShader.frag");
-	shader.use();
 	// configure global opengl State
 	glEnable(GL_DEPTH_TEST);
+
+	Model ourModel("planet/planet.obj");
 
 	// Initialize our sound stream buffer
 	SoundControl soundControl("HOT DRUM.mp3");
@@ -185,38 +189,26 @@ int main() {
 			}
 			count += 1;
 		}
+
+		// view/projection transformations
+		glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+		glm::mat4 view = camera.GetViewMatrix();
+
 		// render
 		glClearColor(0.05f, 0.05f, 0.1f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		shader.use();
-		// view/projection transformations
-		glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
-		glm::mat4 view = camera.GetViewMatrix();
-		shader.setMat4("projection", projection);
-		shader.setMat4("view", view);
+		// function call to view frequency bins
+		//renderCubes(shader, projection, view, cubeVAO, angle, bins);
 
-		//std::cout << cols[3] << std::endl;
-		glBindVertexArray(cubeVAO);
-		for (int i = 0; i < 10; i++) {
-			// World transformation
-			glm::mat4 model;
-			model = glm::rotate(model, glm::radians(angle), glm::vec3(0.0f, 1.0f, 0.0f));
-			model = glm::translate(model, positions[i]);
-			// Set the cube color
-			glm::vec3 color(0.05, bins[i], 0.05f);
-			// Assign the values to our shader
-			shader.setVec3("color", color);
-			shader.setMat4("model", model);
-			// Draw
-			glDrawArrays(GL_TRIANGLES, 0, 36);
-		}
-		if (angle >= 360.0f) {
-			angle = 0;
-		}
-		else {
-			angle += 0.5f;
-		}
+		modelShader.use();
+		// view/projection transformations
+		modelShader.setMat4("projection", projection);
+		modelShader.setMat4("view", view);
+		// render the loaded model
+		glm::mat4 model;
+		modelShader.setMat4("model", model);
+		ourModel.Draw(shader);
 
 		// swap buffers and poll IO events
 		glfwSwapBuffers(window);
@@ -287,4 +279,32 @@ void processInput(GLFWwindow *window) {
 	if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
 		camera.ProcessKeyboard(DOWN, deltaTime);
 	}
+}
+
+// Readlly messy, as we only use this function for looking at frequencies
+void renderCubes(Shader shader, glm::mat4 projection, glm::mat4 view, unsigned int cubeVAO, float angle, float* bins) {
+	shader.use();
+	shader.setMat4("projection", projection);
+	shader.setMat4("view", view);
+	glBindVertexArray(cubeVAO);
+	for (int i = 0; i < 10; i++) {
+		// World transformation
+		glm::mat4 model;
+		//model = glm::rotate(model, glm::radians(angle), glm::vec3(0.0f, 1.0f, 0.0f));
+		model = glm::translate(model, positions[i]);
+		// Set the cube color
+		glm::vec3 color(0.05, bins[i], 0.05f);
+		// Assign the values to our shader
+		shader.setVec3("color", color);
+		shader.setMat4("model", model);
+		// Draw
+		glDrawArrays(GL_TRIANGLES, 0, 36);
+	}
+	if (angle >= 360.0f) {
+		angle = 0;
+	}
+	else {
+		angle += 0.5f;
+	}
+
 }

@@ -5,6 +5,8 @@ Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indecies, std
 	this->vertices = vertices;
 	this->indices = indecies;
 	this->textures = textures;
+
+	_setupMesh();
 }
 
 
