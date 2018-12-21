@@ -28,7 +28,6 @@ SoundControl::SoundControl(const char* soundFile) : _numBins(512), _fftRange(102
 
 SoundControl::~SoundControl() {
 	// Make sure to clean up
-	delete[] _bins;
 	delete[] _prevBins;
 	delete[] _fft;
 }
@@ -46,28 +45,46 @@ void SoundControl::stopAudio() {
 
 float* SoundControl::processBins() {
 	BASS_ChannelGetData(_audioStream, _fft, BASS_DATA_FFT2048);
-	// Scale FFT values
+	int count = 0;
+	int index = 0;
+	float temp = 0;
+	// We need 10 freq data samples. So every 15 bins, we stash our current accumulation and start a new one.
 	float min = 999;
 	float max = -999;
-	for (int i = 0; i < _fftRange; i++) {
-		_fft[i] = sqrt(_fft[i]) * (5.0f);
-		if (_fft[i] < min) {
-			min = _fft[i];
+	for (int i = 24; i < _fftRange; i++) {
+		temp += sqrt(_fft[i]) * (10.0f);
+		if (count == 100) {
+			_bins[index] = temp / 100;
+			if (_bins[index] < min) {
+				min = _bins[index];
+			}
+			if (_bins[index] > max) {
+				max = _bins[index];
+			}
+			index += 1;
+			count = 0;
+			temp = 0;
 		}
-		if (_fft[i] > max) {
-			max = _fft[i];
-		}
+		count += 1;
 	}
+	
 	// Normalize: normalized = (x-min(x))/(max(x)-min(x))
-	for (int i = 0; i < _fftRange; i++) {
-		_fft[i] = (_fft[i] - min) / (max - min);
-	}
-
-	return _fft;
+	/*
+	for (int i = 0; i < 10; i++) {
+		_bins[i] = (_bins[i] - min) / (max - min);
+		std::cout << _bins[i] << " ";
+	}std::cout << "\n";
+	*/
+	return _bins;
 }
 
 
 // Getters and setters 
 int SoundControl::getFFTRange() {
 	return _fftRange;
+}
+
+
+void SoundControl::setVolume(float volume) {
+	BASS_ChannelSetAttribute(_audioStream, BASS_ATTRIB_VOL, volume);
 }

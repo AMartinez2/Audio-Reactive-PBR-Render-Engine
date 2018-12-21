@@ -24,6 +24,7 @@ public:
 	float* processBins();
 	// Getters and setters
 	int getFFTRange();
+	void setVolume(float volume);
 
 private:
 	// Number of bins, basically the resolution/granularity of the frequency reference
@@ -35,7 +36,7 @@ private:
 	// _fftSampleRange = _fftRange / _numBins; 
 	int _fftSampleRange;
 	// Arrays to hold stream information
-	float* _bins;
+	float _bins[10];
 	float* _prevBins;
 	float* _fft;
 };

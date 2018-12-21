@@ -27,7 +27,6 @@ public:
 
 	// ID getter and setter
 	unsigned int getProgramId();
-	void setProgramId();
 
 	// GLUniform getters and setters
 	void setBool	(const std::string &name, bool value) const;

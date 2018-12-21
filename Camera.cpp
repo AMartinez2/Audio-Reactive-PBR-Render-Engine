@@ -3,7 +3,7 @@
 
 // Constructor with vectors
 Camera::Camera(glm::vec3 position, glm::vec3 up, float yaw, float pitch) :
-    Front(glm::vec3(0.0f, 0.0f, -1.0f)),
+	Front(glm::vec3(0.0f, 0.0f, -1.0f)),
     MovementSpeed(SPEED),
     MouseSensitivity(SENSITIVITY),
     Zoom(ZOOM)
@@ -25,7 +25,7 @@ Camera::Camera(float posX,
     float upZ,
     float yaw,
     float pitch) :
-        Front(glm::vec3(0.0f, 0.0f, -1.0f)),
+        Front(glm::vec3(-0.898714f, -0.258819f, 0.354013f)),
         MovementSpeed(SPEED),
         MouseSensitivity(SENSITIVITY),
         Zoom(ZOOM)

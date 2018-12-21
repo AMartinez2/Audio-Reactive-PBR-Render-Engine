@@ -2,6 +2,7 @@
 
 
 Model::Model(std::string const &path, bool gamma) {
+	std::cout << "start of model" << std::endl;
 	_loadModel(path);
 }
 
@@ -14,10 +15,12 @@ void Model::Draw(Shader shader) {
 
 
 void Model::_loadModel(std::string const &path) {
+	std::cout << "load" << std::endl;
 	// Read file via ASSIMP
 	Assimp::Importer importer;
-	const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
+	const aiScene* scene = importer.ReadFile(path, aiProcess_FlipUVs | aiProcess_CalcTangentSpace | aiProcess_Triangulate | aiProcess_GenNormals);
 	// Ceck for errors
+	std::cout << "waffles0" << std::endl;
 	if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) { // if is not zero
 		std::cout << "ERROR::ASSIMP:: " << importer.GetErrorString() << std::endl;
 		return;
@@ -51,7 +54,7 @@ Mesh Model::_processMesh(aiMesh *mesh, const aiScene *scene) {
 	std::vector<Vertex> vertices;
 	std::vector<unsigned int> indices;
 	std::vector<Texture> textures;
-
+	std::cout << "process" << std::endl;
 	// Walk through each of the mesh's vertices
 	for (unsigned int i = 0; i < mesh->mNumVertices; i++) {
 		Vertex vertex;
