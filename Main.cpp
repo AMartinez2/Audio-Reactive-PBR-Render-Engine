@@ -12,6 +12,7 @@
 #include "Camera.h"
 #include "SoundControl.h"
 #include "Model.h"
+#include "PositionData.h"
 
 
 // settings
@@ -28,7 +29,7 @@ void renderCubes(Shader shader, glm::mat4 projection, glm::mat4 view, unsigned i
 
 // camera
 //Camera camera(glm::vec3(7.386900f, 4.178008f, -2.777811f), glm::vec3(0.0f, 1.0f, 0.0f), -15.0f, 185.5f);
-Camera camera(glm::vec3(7.386900f, 4.178008f, -2.777811f));
+Camera camera(glm::vec3(0.0f, 0.0f, 5.5f));
 float lastX = SCR_WIDTH / 2.0f;
 float lastY = SCR_HEIGHT / 2.0f;
 bool firstMouse = true;
@@ -37,78 +38,6 @@ bool firstMouse = true;
 // timing
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
-
-
-// Use primative vertex object just while we resolve frequency interpretation
-float vertices[] = {
-	// positions          
-	-0.5f, -0.5f, -0.5f,  
-	 0.5f, -0.5f, -0.5f,
-	 0.5f,  0.5f, -0.5f,  
-	 0.5f,  0.5f, -0.5f, 
-	-0.5f,  0.5f, -0.5f,  
-	-0.5f, -0.5f, -0.5f, 
-
-	-0.5f, -0.5f,  0.5f,  
-	 0.5f, -0.5f,  0.5f,  
-	 0.5f,  0.5f,  0.5f, 
-	 0.5f,  0.5f,  0.5f,  
-	-0.5f,  0.5f,  0.5f,
-	-0.5f, -0.5f,  0.5f, 
-
-	-0.5f,  0.5f,  0.5f,
-	-0.5f,  0.5f, -0.5f, 
-	-0.5f, -0.5f, -0.5f, 
-	-0.5f, -0.5f, -0.5f, 
-	-0.5f, -0.5f,  0.5f,
-	-0.5f,  0.5f,  0.5f,
-
-	 0.5f,  0.5f,  0.5f,
-	 0.5f,  0.5f, -0.5f, 
-	 0.5f, -0.5f, -0.5f,
-	 0.5f, -0.5f, -0.5f,
-	 0.5f, -0.5f,  0.5f,
-	 0.5f,  0.5f,  0.5f, 
-
-	-0.5f, -0.5f, -0.5f, 
-	 0.5f, -0.5f, -0.5f, 
-	 0.5f, -0.5f,  0.5f,
-	 0.5f, -0.5f,  0.5f, 
-	-0.5f, -0.5f,  0.5f,  
-	-0.5f, -0.5f, -0.5f, 
-
-	-0.5f,  0.5f, -0.5f, 
-	 0.5f,  0.5f, -0.5f,
-	 0.5f,  0.5f,  0.5f,
-	 0.5f,  0.5f,  0.5f,
-	-0.5f,  0.5f,  0.5f,
-	-0.5f,  0.5f, -0.5f,
-};
-
-
-glm::vec3 positions[] = {
-	glm::vec3(-1.0f, 0.0f, 0.0f),
-	glm::vec3(1.0f, 0.0f, 0.0f),
-	glm::vec3(-3.0f, 0.0f, 0.0f),
-	glm::vec3(3.0f, 0.0f, 0.0f),
-	glm::vec3(-5.0f, 0.0f, 0.0f),
-	glm::vec3(5.0f, 0.0f, 0.0f),
-	glm::vec3(-7.0f, 0.0f, 0.0f),
-	glm::vec3(7.0f, 0.0f, 0.0f),
-	glm::vec3(-9.0f, 0.0f, 0.0f),
-	glm::vec3(9.0f, 0.0f, 0.0f),
-	glm::vec3(13.0f, 0.0f, 0.0f),
-};
-
-
-glm::vec3 pointLightPositions[] = {
-		glm::vec3(2.0f,  2.0f,  3.0f),
-		glm::vec3(-2.0f,  2.0f,  -3.0f),
-		glm::vec3(0.7f,  0.2f,  2.0f),
-		glm::vec3(2.3f, -3.3f, -4.0f),
-		glm::vec3(-4.0f,  2.0f, -12.0f),
-		glm::vec3(0.0f,  0.0f, -3.0f)
-};
 
 
 // Program entry point
@@ -173,7 +102,8 @@ int main() {
 	//Model ourModel("./models/planet/planet.obj");
 	//Model ourModel("./spider/spider.obj");
 
-	Model ourModel("./models/stag/untitled.obj");
+	Model ourModel("./models/deathtrooper/untitled.obj");
+	Model cubeModel("./models/cube/untitled.obj");
 
 	// Initialize our sound stream buffer
 	SoundControl soundControl("HOT DRUM.mp3");
@@ -186,7 +116,6 @@ int main() {
 	//soundControl.setVolume(.1);
 	soundControl.playAudio();
 
-	camera.Front = glm::vec3(-0.879961, -0.284015, 0.380793);
 	// render loop
 	while (!glfwWindowShouldClose(window)) {
 		// per-frame time logic
@@ -204,7 +133,7 @@ int main() {
 			bins[i] = temp[i];
 		}
 		// view/projection transformations
-		glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+		glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom)*2, (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f); // adjust FOV here
 		glm::mat4 view = camera.GetViewMatrix();
 
 		// render
@@ -220,8 +149,9 @@ int main() {
 		modelShader.setFloat("material.shininess", 32.0f);
 
 		// directional light
+		modelShader.setVec3("dirLight.position", glm::vec3(0.0f, 0.0f, 0.0f));
 		modelShader.setVec3("dirLight.direction", -0.2f, -1.0f, -0.3f);
-		modelShader.setVec3("dirLight.ambient", 0.05f, 0.05f, 0.05f);
+		modelShader.setVec3("dirLight.ambient", 0.0f, 0.0f , 0.0f);
 		modelShader.setVec3("dirLight.diffuse", 0.4f, 0.4f, 0.4f);
 		modelShader.setVec3("dirLight.specular", 0.5f, 0.5f, 0.5f);
 
@@ -239,19 +169,19 @@ int main() {
 		std::string uniform = "pointLights[0]";
 		modelShader.setVec3(uniform + ".position", pointLightPositions[0]);
 		modelShader.setVec3(uniform + ".ambient", 0.05f, 0.05f, 0.05f);
-		modelShader.setVec3(uniform + ".diffuse", 0.8f, 0.8f, 0.8f);
+		modelShader.setVec3(uniform + ".diffuse", 0.5f, 0.5f, 0.5f);
 		modelShader.setVec3(uniform + ".specular", 1.0f, 1.0f, 1.0f);
-		modelShader.setFloat(uniform + ".constant", 1 - ((bins[0] + bins[1] + bins[2] ) / 3));
-		modelShader.setFloat(uniform + ".linear", 0.09);
-		modelShader.setFloat(uniform + ".quadratic", 0.032);
+		modelShader.setFloat(uniform + ".constant", 1.0f);
+		modelShader.setFloat(uniform + ".linear", 0.0014f);
+		modelShader.setFloat(uniform + ".quadratic", bins[0]/1000);
 
 		std::string uniform2 = "pointLights[1]";
 		modelShader.setVec3(uniform2 + ".position", pointLightPositions[1]);
 		modelShader.setVec3(uniform2 + ".ambient", 0.05f, 0.05f, 0.05f);
-		modelShader.setVec3(uniform2 + ".diffuse", 0.8f, 0.8f, 0.8f);
+		modelShader.setVec3(uniform2 + ".diffuse", 0.9f, 0.9f, 0.9f);
 		modelShader.setVec3(uniform2 + ".specular", 1.0f, 1.0f, 1.0f);
-		modelShader.setFloat(uniform2 + ".constant", 1 - (( bins[6] + bins[7] + bins[8]) / 3));
-		modelShader.setFloat(uniform2 + ".linear", 0.09);
+		modelShader.setFloat(uniform2 + ".constant", 1.0f - (( bins[6] + bins[7]) / 2));
+		modelShader.setFloat(uniform2 + ".linear", 1.0);
 		modelShader.setFloat(uniform2 + ".quadratic", 0.032);
 
 		/*
@@ -286,9 +216,21 @@ int main() {
 
 		// render the loaded model
 		glm::mat4 model;
-		model = glm::scale(model, glm::vec3(0.5f));
+		model = glm::scale(model, glm::vec3(0.2f));
+		model = glm::rotate(model, glm::radians(angle), glm::vec3(0.0f, 1.0f, 0.0f));
+		model = glm::translate(model, glm::vec3(0.0f, -3.0f, 0.0f));
 		modelShader.setMat4("model", model);
 		ourModel.Draw(modelShader);
+
+		// Draw the cubes that frame the scene
+		for (int i = 0; i < 6; i++) {
+			model = glm::mat4();
+			model = glm::scale(model, glm::vec3(3.0f));
+			model = glm::rotate(model, glm::radians(angle), glm::vec3(0.0f, 1.0f, 0.0f));
+			model = glm::translate(model, cubePositions[i]);
+			modelShader.setMat4("model", model);
+			cubeModel.Draw(modelShader);
+		}
 
 		// also draw the lamp object(s)
 		lightShader.use();
@@ -300,12 +242,21 @@ int main() {
 		glBindVertexArray(lightVAO);
 		for (unsigned int i = 0; i < 2; i++) {
 			model = glm::mat4();
-			model = glm::translate(model, pointLightPositions[i]);
 			model = glm::scale(model, glm::vec3(0.2f)); // Make it a smaller cube
+			model = glm::rotate(model, glm::radians(angle), glm::vec3(0.0f, 1.0f, 0.0f));
+			model = glm::translate(model, pointLightPositions[i]);
 			lightShader.setMat4("model", model);
 			glDrawArrays(GL_TRIANGLES, 0, 36);
 		}
-		std::cout << "Position: " << glm::to_string(camera.Position) << " | Front: " << glm::to_string(camera.Front) << " | Pitch: " << camera.Pitch << " | Yaw: " << camera.Yaw << std::endl;
+		
+		if (angle == 360) {
+			angle = 0;
+		}
+		else {
+			angle += 0.3;
+		}
+
+		//std::cout << "Position: " << glm::to_string(camera.Position) << " | Front: " << glm::to_string(camera.Front) << " | Pitch: " << camera.Pitch << " | Yaw: " << camera.Yaw << std::endl;
 		// swap buffers and poll IO events
 		glfwSwapBuffers(window);
 		glfwPollEvents();
