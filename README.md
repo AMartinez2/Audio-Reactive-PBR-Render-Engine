@@ -1,7 +1,7 @@
 # Audio Reactive PBR Render Engine
 
 
-### Dependancies
+### Dependencies
 * [OpenGl](https://www.opengl.org/)
 * [GLAD](https://glad.dav1d.de/)
 * [GLFW](https://www.glfw.org/)
