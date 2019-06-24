@@ -1,5 +1,8 @@
 # Audio Reactive PBR Render Engine
+Extracts frequency data from audio and uses it to alter lighting shader parameters. 
 
+### Demo
+[![DEMO PREVIEW](https://img.youtube.com/vi/967pWoz0MPE&feature=youtu.be/0.jpg)](https://www.youtube.com/watch?v=967pWoz0MPE&feature=youtu.be) 
 
 ### Dependencies
 * [OpenGl](https://www.opengl.org/)
