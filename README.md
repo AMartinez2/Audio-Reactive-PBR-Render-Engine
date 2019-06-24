@@ -2,7 +2,7 @@
 Extracts frequency data from audio and uses it to alter lighting shader parameters. 
 
 ### Demo
-[![DEMO PREVIEW](https://img.youtube.com/vi/967pWoz0MPE&feature=youtu.be/0.jpg)](https://www.youtube.com/watch?v=967pWoz0MPE&feature=youtu.be) 
+[![DEMO PREVIEW](https://img.youtube.com/vi/967pWoz0MPE/1.jpg)](https://www.youtube.com/watch?v=967pWoz0MPE) 
 
 ### Dependencies
 * [OpenGl](https://www.opengl.org/)
