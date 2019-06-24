@@ -71,9 +71,9 @@ glm::vec3 positions[] = {
 
 
 glm::vec3 pointLightPositions[] = {
-	glm::vec3(10.0f,  10.0f,  11.0f),
-	glm::vec3(-10.0f,  10.0f,  -11.0f),
-	glm::vec3(0.7f,  0.2f,  2.0f),
+	glm::vec3(5.0f,  5.0f,  6.0f),
+	glm::vec3(-5.0f,  5.0f,  6.0f),
+	glm::vec3(0.0f, 0.0f, -5.0f),
 	glm::vec3(2.3f, -3.3f, -4.0f),
 	glm::vec3(-4.0f,  2.0f, -12.0f),
 	glm::vec3(0.0f,  0.0f, -3.0f)
@@ -81,12 +81,12 @@ glm::vec3 pointLightPositions[] = {
 
 
 glm::vec3 cubePositions[] = {
-	glm::vec3(-5.0f, 0.0f, 0.0f),
-	glm::vec3(5.0f, 0.0f, 0.0f),
-	glm::vec3(0.0f, -5.0f, 0.0f),
-	glm::vec3(0.0f, 5.0f, 0.0f),
-	glm::vec3(0.0f, 0.0f, -5.0f),
-	glm::vec3(0.0f, 0.0f, 5.0f)
+	glm::vec3(-8.0f, 0.0f, 0.0f),
+	glm::vec3(8.0f, 0.0f, 0.0f),
+	glm::vec3(0.0f, -8.0f, 0.0f),
+	glm::vec3(0.0f, 8.0f, 0.0f),
+	glm::vec3(0.0f, 0.0f, -8.0f),
+	glm::vec3(0.0f, 0.0f, 8.0f)
 };
 
 
